@@ -27,13 +27,13 @@ def load_file():
     return None
 
 def send():
-    gas_str = gas_text.get("1.0", "end-1c").strip()
+    gas_str = selected_gas.get()
     dil_str = dil_text.get("1.0", "end-1c").strip()
     error_label.config(text="")
 
     if gas_str and dil_str:
         try:
-            gas = gas_str + " (ppm)"
+            gas = gas_str
             dil_val = int(dil_str)
             if not (3 <= dil_val <= 6):
                 raise ValueError("Number of dilutions must be between 3 and 6")
@@ -96,7 +96,7 @@ def visualize(file_path, gas_name, num_dilutions):
     colors = ['red', 'green', 'orange', 'purple', 'deepskyblue', 'darkgreen']
     for i in range(num_dilutions):
         ax_slider = plt.axes([0.085 if i < 3 else 0.38, 0.25 - 0.05 * (i % 3), 0.2, 0.03], facecolor='lightgoldenrodyellow')
-        slider = Slider(ax_slider, f'{i+1}th Dilution\n(ppm)', 0, len(data['Time_from_start']) - 30, valinit=0, color=colors[i])
+        slider = Slider(ax_slider, f'{i+1}th Dilution\n', 0, len(data['Time_from_start']) - 30, valinit=0, color=colors[i])
         sliders.append(slider)
         highlight, = axes[0].plot(data['Time_from_start'][:30], gas[:30], 'o', color=colors[i], markersize=5)
         highlights.append(highlight)
@@ -106,7 +106,7 @@ def visualize(file_path, gas_name, num_dilutions):
     dilution_boxes = []
     for i in range(num_dilutions):
         ax_box = plt.axes([0.75, 0.3 - 0.05 * i, 0.15, 0.03])
-        box = TextBox(ax_box, f'Dil {i+1} Concentration (ppm) =', initial="")
+        box = TextBox(ax_box, f'Dil {i+1} Concentration =', initial="")
         dilution_boxes.append(box)
 
     # Function to handle submission from TextBox widgets
@@ -179,10 +179,10 @@ load_button.grid(row=0, column=0, padx=10, pady=5)
 file_label = ttk.Label(frame, text="", font=('Sans-serif', 12))
 file_label.grid(row=0, column=1, padx=10, pady=5, columnspan=4)
 
-gas_label = ttk.Label(frame, text="Calibration gas = ", font=('Sans-serif', 12))
+selected_gas = tk.StringVar(frame)
+selected_gas.set('Select a Calibration Gas')
+gas_label = ttk.OptionMenu(frame, selected_gas, 'Select a Calibration Gas', 'N2O (ppm)', 'CO2(ppm)', 'CH4 (ppm)', 'C2H6 (ppb)')
 gas_label.grid(row=1, column=0, padx=10, pady=5)
-gas_text = Text(frame, height=1, width=7, font=('Sans-serif', 12))
-gas_text.grid(row=1, column=1, padx=10, pady=5)
 
 dil_label = ttk.Label(frame, text="Number of dilutions = ", font=('Sans-serif', 12))
 dil_label.grid(row=1, column=2, padx=10, pady=5)
